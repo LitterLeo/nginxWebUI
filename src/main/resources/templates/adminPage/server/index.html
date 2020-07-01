@@ -73,6 +73,23 @@
 						<div class="layui-input-inline">
 							<input type="text" name="name" class="layui-input" value="${name}">
 						</div>
+
+						<div class="layui-inline" style="margin: 0 8px">
+							<label>域名</label>
+						</div>
+						<div class="layui-input-inline">
+							<input type="text" name="serverName" class="layui-input" value="${serverName}">
+						</div>
+
+						<div class="layui-inline" style="margin: 0 8px">
+							<label>状态</label>
+						</div>
+						<div class="layui-input-inline">
+							<select name="enable" id="enable">
+								<option value="true" <#if enable==true>selected</#if>>启用</option>
+								<option value="false" <#if enable==false>selected</#if>>停用</option>
+							</select>
+						</div>
 						<button type="button" class="layui-btn" onclick="search()">搜索</button>
 						
 						<input type="hidden" name="sort" id="sort" value="${sort}">
@@ -92,7 +109,7 @@
 								<th>ssl选项</th>
 								<th>ssl文件路径</th>
 								<th>代理目标</th>
-								<th>启用</th>
+								<th>状态</th>
 								<th>操作</th>
 							</tr>
 						</thead>

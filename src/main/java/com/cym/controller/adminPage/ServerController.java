@@ -36,8 +36,12 @@ public class ServerController extends BaseController {
 	@Autowired
 	ParamService paramService;
 	@RequestMapping("")
-	public ModelAndView index(HttpSession httpSession, ModelAndView modelAndView, Page page, String sort, String direction, String name) {
-		page = serverService.search(page, sort, direction, name);
+	public ModelAndView index(HttpSession httpSession, ModelAndView modelAndView, Page page, String sort, String direction,
+                              String name, String serverName, Boolean enable) {
+	    if (enable == null) {
+	        enable = true;
+        }
+		page = serverService.search(page, sort, direction, name, serverName, enable);
 
 		List<ServerExt> exts = new ArrayList<ServerExt>();
 		for (Server server : page.getRecords(Server.class)) {
@@ -73,6 +77,8 @@ public class ServerController extends BaseController {
 		modelAndView.addObject("sort", sort);
 		modelAndView.addObject("direction", direction);
 		modelAndView.addObject("name", name);
+		modelAndView.addObject("serverName", serverName);
+		modelAndView.addObject("enable", enable);
 		modelAndView.setViewName("/adminPage/server/index");
 		return modelAndView;
 	}

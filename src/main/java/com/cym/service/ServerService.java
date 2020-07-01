@@ -25,12 +25,20 @@ public class ServerService {
 	@Autowired
 	SqlHelper sqlHelper;
 
-	public Page search(Page page, String sortColum, String direction, String name) {
+	public Page search(Page page, String sortColum, String direction, String name, String serverName, Boolean enable) {
 
 		ConditionAndWrapper conditionAndWrapper = new ConditionAndWrapper();
 
 		if (StrUtil.isNotEmpty(name)) {
 			conditionAndWrapper.and(new ConditionOrWrapper().like("name", name));
+		}
+
+		if (StrUtil.isNotEmpty(serverName)) {
+			conditionAndWrapper.and(new ConditionOrWrapper().like("serverName", serverName));
+		}
+
+		if (enable != null) {
+			conditionAndWrapper.eq("enable", enable);
 		}
 
 		Sort sort = null;
