@@ -23,7 +23,10 @@ public class Server extends BaseModel {
 	
 	@InitValue("true")
 	Boolean enable; // 是否启用
-	
+	/**
+	 * 名称
+	 */
+	String name;
 	
 	public Boolean getEnable() {
 		return enable;
@@ -100,6 +103,11 @@ public class Server extends BaseModel {
 		this.rewrite = rewrite;
 	}
 
-	
+	public String getName() {
+		return name;
+	}
 
+	public void setName(String name) {
+		this.name = name;
+	}
 }

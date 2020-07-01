@@ -3,8 +3,9 @@
 <head>
 <#include "/adminPage/common.html"/>
 <style type="text/css">
+
 .layui-form-label {
-	width: 150px;
+	width: 100px;
 }
 
 .layui-input-block {
@@ -65,6 +66,14 @@
 						<div class="layui-inline">
 							<button type="button" class="layui-btn layui-btn-normal" onclick="add()">添加反向代理</button>
 						</div>
+
+						<div class="layui-inline">
+							<label class="layui-form-label">名称</label>
+						</div>
+						<div class="layui-input-inline">
+							<input type="text" name="name" class="layui-input" value="${name}">
+						</div>
+						<button type="button" class="layui-btn" onclick="search()">搜索</button>
 						
 						<input type="hidden" name="sort" id="sort" value="${sort}">
 						<input type="hidden" name="direction" id="direction" value="${direction}">
@@ -75,6 +84,7 @@
 					<table class="layui-table layui-form" >
 						<thead>
 							<tr>
+								<th>名称</th>
 								<th>转发类型 <i class="layui-icon ${(direction=='desc'&&sort=='proxyType')?string('layui-icon-down','layui-icon-up')} ${(sort=='proxyType')?string('blue','')}" id="proxyTypeSort"  onclick="sort('proxyTypeSort')"></i></th>
 								<th>监听端口 <i class="layui-icon ${(direction=='desc'&&sort=='listen')?string('layui-icon-down','layui-icon-up')} ${(sort=='listen')?string('blue','')}" id="listenSort"  onclick="sort('listenSort')"></i></th>
 								<th>监听域名 <i class="layui-icon ${(direction=='desc'&&sort=='serverName')?string('layui-icon-down','layui-icon-up')} ${(sort=='serverName')?string('blue','')}" id="serverNameSort" onclick="sort('serverNameSort')"></i></th>
@@ -89,6 +99,7 @@
 						<tbody>
 							<#list page.records as ext>
 							<tr>
+								<td>${ext.server.name}</td>
 								<td>
 									<#if ext.server.proxyType==0>http</#if>
 									<#if ext.server.proxyType==1>TCP</#if>
@@ -150,8 +161,15 @@
 		<div class="layui-form" id="windowDiv" style="padding: 15px; display: none">
 			<form id="addForm">
 				<input type="hidden" id="id" name="id">
-				
+
 				<div class="layui-form-item" style="padding: 0 15px;">
+
+					<div class="layui-form-item">
+						<label class="layui-form-label">名称<span class="red">*</span></label>
+						<div class="layui-input-inline">
+							<input type="text" name="name" id="name" class="layui-input">
+						</div>
+					</div>
 					<label class="layui-form-label">转发类型</label>
 					<div class="layui-input-inline">
 						<select name="proxyType" id="proxyType" lay-filter="proxyType">
@@ -174,8 +192,8 @@
 							</select>
 						</div>
 					</div>
-					
-					
+
+
 					<div class="pemDiv">
 						<div class="proxyHttp">
 							<label class="layui-form-label"></label>
@@ -186,7 +204,7 @@
 						</div>
 					</div>
 					
-					
+
 				</div>
 							
 				<div class="layui-container" >

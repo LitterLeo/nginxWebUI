@@ -25,13 +25,20 @@ public class ServerService {
 	@Autowired
 	SqlHelper sqlHelper;
 
-	public Page search(Page page, String sortColum, String direction) {
+	public Page search(Page page, String sortColum, String direction, String name) {
+
+		ConditionAndWrapper conditionAndWrapper = new ConditionAndWrapper();
+
+		if (StrUtil.isNotEmpty(name)) {
+			conditionAndWrapper.and(new ConditionOrWrapper().like("name", name));
+		}
+
 		Sort sort = null;
 		if (StrUtil.isNotEmpty(sortColum)) {
 			sort = new Sort(sortColum, "asc".equalsIgnoreCase(direction) ? Direction.ASC : Direction.DESC);
 		}
 
-		page = sqlHelper.findPage(sort, page, Server.class);
+		page = sqlHelper.findPage(conditionAndWrapper, sort, page, Server.class);
 
 		return page;
 	}

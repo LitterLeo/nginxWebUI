@@ -105,6 +105,8 @@ function search() {
 
 function add() {
 	$("#id").val("");
+	$("#name").val("");
+	$("#groupType option:first").prop("selected", true);
 	$("#listen").val("");
 	$("#serverName").val("");
 	$("#ssl option:first").prop("selected", true);
@@ -137,6 +139,11 @@ function showWindow(title) {
 }
 
 function addOver() {
+	if($("#name").val().trim() == ''){
+		layer.msg("名称未填写");
+		return;
+	}
+
 	if($("#listen").val().trim() == ''){
 		layer.msg("端口未填写");
 		return;
@@ -213,6 +220,7 @@ function edit(id) {
 				
 				var server = data.obj.server;
 				$("#id").val(server.id);
+				$("#name").val(server.name);
 				$("#listen").val(server.listen);
 				$("#serverName").val(server.serverName);
 				$("#ssl").val(server.ssl);

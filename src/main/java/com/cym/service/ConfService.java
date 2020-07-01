@@ -197,55 +197,32 @@ public class ConfService {
 				List<Location> locationList = serverService.getLocationByServerId(server.getId());
 
 				// http参数配置
-				for (Location location : locationList) {
+				if (locationList.size() == 1 && locationList.get(0).getType() == 1) {
+					Location location = locationList.get(0);
+
 					NgxBlock ngxBlockLocation = new NgxBlock();
-					if (location.getType() == 0 || location.getType() == 2) { // http或负载均衡
-						// 添加location
-						ngxBlockLocation.addValue("location");
-						ngxBlockLocation.addValue(location.getPath());
+					ngxBlockLocation.addValue("location");
+					ngxBlockLocation.addValue(location.getPath());
 
-						if (location.getType() == 0) {
-							ngxParam = new NgxParam();
-							ngxParam.addValue("proxy_pass " + location.getValue());
-							ngxBlockLocation.addEntry(ngxParam);
-						} else if (location.getType() == 2) {
-							Upstream upstream = sqlHelper.findById(location.getUpstreamId(), Upstream.class);
-							if (upstream != null) {
-								ngxParam = new NgxParam();
-								ngxParam.addValue("proxy_pass http://" + upstream.getName() + (location.getUpstreamPath() != null ? location.getUpstreamPath() : ""));
-								ngxBlockLocation.addEntry(ngxParam);
-							}
+					if (location.getPath().equals("/")) {
+
+						ngxParam = new NgxParam();
+						ngxParam.addValue("root " + location.getValue());
+						ngxBlockServer.addEntry(ngxParam);
+
+						// 自定义参数
+						paramList = paramService.getListByTypeId(server.getId(), "server");
+						for (Param param : paramList) {
+							setSameParam(param, ngxBlockServer);
 						}
 
 						ngxParam = new NgxParam();
-						ngxParam.addValue("proxy_set_header Host $host");
+						ngxParam.addValue("try_files $uri $uri/ /index.html;");
 						ngxBlockLocation.addEntry(ngxParam);
-
+					} else {
 						ngxParam = new NgxParam();
-						ngxParam.addValue("proxy_set_header X-Real-IP $remote_addr");
+						ngxParam.addValue("alias " + location.getValue());
 						ngxBlockLocation.addEntry(ngxParam);
-
-						ngxParam = new NgxParam();
-						ngxParam.addValue("proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for");
-						ngxBlockLocation.addEntry(ngxParam);
-
-						ngxParam = new NgxParam();
-						ngxParam.addValue("proxy_set_header X-Forwarded-Proto $scheme");
-						ngxBlockLocation.addEntry(ngxParam);
-
-					} else if (location.getType() == 1) { // 静态html
-						ngxBlockLocation.addValue("location");
-						ngxBlockLocation.addValue(location.getPath());
-
-						if (location.getPath().equals("/")) {
-							ngxParam = new NgxParam();
-							ngxParam.addValue("root " + location.getValue());
-							ngxBlockLocation.addEntry(ngxParam);
-						} else {
-							ngxParam = new NgxParam();
-							ngxParam.addValue("alias " + location.getValue());
-							ngxBlockLocation.addEntry(ngxParam);
-						}
 
 						ngxParam = new NgxParam();
 						ngxParam.addValue("index index.html");
@@ -260,7 +237,73 @@ public class ConfService {
 
 					ngxBlockServer.addEntry(ngxBlockLocation);
 
+				} else {
+					for (Location location : locationList) {
+						NgxBlock ngxBlockLocation = new NgxBlock();
+						if (location.getType() == 0 || location.getType() == 2) { // http或负载均衡
+							// 添加location
+							ngxBlockLocation.addValue("location");
+							ngxBlockLocation.addValue(location.getPath());
+
+							if (location.getType() == 0) {
+								ngxParam = new NgxParam();
+								ngxParam.addValue("proxy_pass " + location.getValue());
+								ngxBlockLocation.addEntry(ngxParam);
+							} else if (location.getType() == 2) {
+								Upstream upstream = sqlHelper.findById(location.getUpstreamId(), Upstream.class);
+								if (upstream != null) {
+									ngxParam = new NgxParam();
+									ngxParam.addValue("proxy_pass http://" + upstream.getName() + (location.getUpstreamPath() != null ? location.getUpstreamPath() : ""));
+									ngxBlockLocation.addEntry(ngxParam);
+								}
+							}
+
+							ngxParam = new NgxParam();
+							ngxParam.addValue("proxy_set_header Host $host");
+							ngxBlockLocation.addEntry(ngxParam);
+
+							ngxParam = new NgxParam();
+							ngxParam.addValue("proxy_set_header X-Real-IP $remote_addr");
+							ngxBlockLocation.addEntry(ngxParam);
+
+							ngxParam = new NgxParam();
+							ngxParam.addValue("proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for");
+							ngxBlockLocation.addEntry(ngxParam);
+
+							ngxParam = new NgxParam();
+							ngxParam.addValue("proxy_set_header X-Forwarded-Proto $scheme");
+							ngxBlockLocation.addEntry(ngxParam);
+
+						} else if (location.getType() == 1) { // 静态html
+							ngxBlockLocation.addValue("location");
+							ngxBlockLocation.addValue(location.getPath());
+
+							if (location.getPath().equals("/")) {
+								ngxParam = new NgxParam();
+								ngxParam.addValue("root " + location.getValue());
+								ngxBlockLocation.addEntry(ngxParam);
+							} else {
+								ngxParam = new NgxParam();
+								ngxParam.addValue("alias " + location.getValue());
+								ngxBlockLocation.addEntry(ngxParam);
+							}
+
+							ngxParam = new NgxParam();
+							ngxParam.addValue("index index.html");
+							ngxBlockLocation.addEntry(ngxParam);
+						}
+
+						// 自定义参数
+						paramList = paramService.getListByTypeId(location.getId(), "location");
+						for (Param param : paramList) {
+							setSameParam(param, ngxBlockLocation);
+						}
+
+						ngxBlockServer.addEntry(ngxBlockLocation);
+
+					}
 				}
+
 				hasHttp = true;
 
 				// 是否需要分解
